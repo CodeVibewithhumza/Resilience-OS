@@ -9,7 +9,13 @@ import {
   Maximize2,
   Settings as CogIcon,
   ChevronRight,
-  Info
+  Info,
+  Sparkles,
+  RefreshCw,
+  Home,
+  Box,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import TwinContainer from '../DigitalTwin3D/TwinContainer'
 import './IncidentTimelineView.css'
@@ -46,8 +52,10 @@ export default function IncidentTimelineView({
   onReset,
   assets = [],
   services = [],
-  resilience
+  resilience,
+  onNavigate
 }) {
+  const [peekMode, setPeekMode] = useState(false)
   const [selectedEventFilter, setSelectedEventFilter] = useState('all')
   const [currentTimeStep, setCurrentTimeStep] = useState('T+10m')
   const [viewMode, setViewMode] = useState('3d') // '3d' | '2d'
@@ -149,9 +157,130 @@ export default function IncidentTimelineView({
   ]
 
   return (
-    <div className="incident-timeline-page">
-      {/* 1. TOP MILESTONE PROGRESSION BAR */}
-      <section className="timeline-progression-bar-card">
+    <div className={`incident-timeline-page ${!peekMode ? 'has-maintenance-overlay' : 'in-peek-mode'}`}>
+      {/* 0. MAINTENANCE / COMING SOON OVERLAY */}
+      {!peekMode ? (
+        <div
+          className="timeline-maintenance-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Incident Timeline is Updating"
+        >
+          <div className="maintenance-glass-card">
+            {/* Cyber Corner Glow Brackets */}
+            <div className="cyber-bracket bracket-tl" />
+            <div className="cyber-bracket bracket-tr" />
+            <div className="cyber-bracket bracket-bl" />
+            <div className="cyber-bracket bracket-br" />
+
+            {/* Status Radar & Badge */}
+            <div className="maintenance-badge-bar">
+              <span className="maintenance-live-badge">
+                <span className="radar-ping" />
+                <span className="radar-dot" />
+                SYSTEM UPDATE IN PROGRESS
+              </span>
+              <span className="maintenance-version-pill font-mono">MODULE V2.4-STAGING</span>
+            </div>
+
+            {/* Glowing Orbital Icon */}
+            <div className="maintenance-icon-hub">
+              <div className="orbital-ring orbital-outer" />
+              <div className="orbital-ring orbital-inner" />
+              <div className="icon-glow-halo" />
+              <div className="icon-core">
+                <Clock className="maintenance-icon-clock" size={32} />
+              </div>
+            </div>
+
+            {/* Headers & Copy */}
+            <div className="maintenance-text-group">
+              <h1 className="maintenance-title">This Page Is Updating</h1>
+              <div className="maintenance-subtitle-pill">
+                <Sparkles size={14} className="subtitle-sparkle" />
+                <span>Coming Back Soon</span>
+              </div>
+              <p className="maintenance-description">
+                The Incident Timeline and temporal cascade scrubber are undergoing high-precision performance optimizations and real-time backend synchronization. We'll be back online shortly with upgraded cascade analytics.
+              </p>
+            </div>
+
+            {/* Cyber Progress Indicator */}
+            <div className="maintenance-progress-box font-mono">
+              <div className="progress-top-labels">
+                <span className="progress-phase-tag">PIPELINE: TELEMETRY SYNC & REFINEMENT</span>
+                <span className="progress-status-tag">OPTIMIZING</span>
+              </div>
+              <div className="cyber-progress-track">
+                <div className="cyber-progress-bar-animated" />
+              </div>
+              <div className="progress-sub-bullets font-sans">
+                <span><RefreshCw size={11} className="spin-icon" /> Synchronizing temporal incident states</span>
+                <span>• Calibrating 3D cascade trajectory pins</span>
+              </div>
+            </div>
+
+            {/* Navigation & Peek Actions */}
+            <div className="maintenance-actions-row">
+              {onNavigate && (
+                <>
+                  <button
+                    type="button"
+                    className="maintenance-btn primary"
+                    onClick={() => onNavigate('dashboard')}
+                  >
+                    <Home size={15} />
+                    <span>Return to Dashboard</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="maintenance-btn secondary"
+                    onClick={() => onNavigate('digital-twin')}
+                  >
+                    <Box size={15} />
+                    <span>View Digital Twin</span>
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                className="maintenance-btn ghost"
+                onClick={() => setPeekMode(true)}
+                title="Temporarily preview the underlying timeline interface"
+              >
+                <Eye size={15} />
+                <span>Peek Preview</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="peek-mode-banner">
+          <div className="peek-banner-inner">
+            <span className="peek-badge font-mono">
+              <Eye size={13} />
+              PEEK MODE (PREVIEW)
+            </span>
+            <span className="peek-text">Overlay temporarily minimized. Page is undergoing updates.</span>
+            <button
+              type="button"
+              className="peek-restore-btn"
+              onClick={() => setPeekMode(false)}
+            >
+              <EyeOff size={13} />
+              Restore Overlay
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 1. UNDERLYING TIMELINE CONTENT (BLURRED WHEN OVERLAY IS ACTIVE) */}
+      <div
+        className={`incident-timeline-blurred-body ${!peekMode ? 'is-blurred' : 'is-unblurred'}`}
+        aria-hidden={!peekMode}
+      >
+        {/* 1. TOP MILESTONE PROGRESSION BAR */}
+        <section className="timeline-progression-bar-card">
         <div className="milestones-track-wrapper">
           <div className="milestone-gradient-line" />
           <div className="milestones-nodes-row">
@@ -504,6 +633,8 @@ export default function IncidentTimelineView({
           </div>
         </div>
       </section>
+      </div>
     </div>
   )
 }
+

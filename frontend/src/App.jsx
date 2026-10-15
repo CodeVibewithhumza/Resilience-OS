@@ -1360,6 +1360,7 @@ export default function App() {
               assets={assets}
               services={services}
               resilience={resilience}
+              onNavigate={(sec) => setActiveSection(sec)}
             />
           )}
 
